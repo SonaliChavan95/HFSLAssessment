@@ -1,0 +1,17 @@
+{
+  "name": "news_data",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Sonali Chavan",
+  "license": "ISC",
+  "dependencies": {
+    "fast-csv": "^4.3.6",
+    "moment-timezone": "^0.5.32",
+    "mysql": "^2.18.1",
+    "mysql-async-simple": "^1.0.3"
+  }
+}

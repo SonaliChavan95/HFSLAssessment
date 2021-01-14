@@ -1,0 +1,44 @@
+Write a short summary of your work, challenges encountered and the particular solution that you implemented.
+
+Specifications:
+Language: JavaScript using Node.js
+Database: MySQL
+
+Steps to run code:
+1. `npm install`
+2. Update db configuration in app.js -> dbConfig (at line 6) and make sure mySQL is up and running.
+3. `npm start`
+
+I have used Node.js for reading the text file and uploading data into the MySql database. To store data into DB I have created the following schema:
+1. header(id INT, ric VARCHAR(255), start_at DATETIME, end_at DATETIME, created_at DATETIME, major_version int, minor_version int)
+    It saves all the values(metadata) that we received in that text file.
+2. items(guid VARCHAR(255), alt_id VARCHAR(255), first_created DATETIME, headline TEXT, language VARCHAR(255), message_type INT, provider VARCHAR(255), pub_status VARCHAR(255), take_sequence INT, urgency INT, version_created DATETIME, mime_type VARCHAR(255), body TEXT, AMER_timestamp DATETIME, APAC_timestamp DATETIME, EMEA_timestamp DATETIME)
+    It saves the individual collected news items that are stored in an Items array. Some of the fields like the subject, audience, instanceOf are in array format i.e. It has more than one value. Due to this, I have moved them into separate tables as shown below. Also in each item, id and guid contain the same unique identification of the record, hence I have stored the only guid.
+3. subject_news(guid VARCHAR(255), code VARCHAR(255))
+    As stated above, it saves the value of all the subject per news item where "guid" is the unique identifier of the news item and "code" contains the subject code.
+4. audience_news(guid VARCHAR(255), code VARCHAR(255))
+    As stated above, it saves the value of all the audiences per news item where "guid" is the unique identifier of the news item and "code" contains the audience code.
+5. instances_of_news(guid VARCHAR(255), code VARCHAR(255))
+    As stated above, it saves the value of all the instanceOf per news item where "guid" is the unique identifier of the news item and "code" contains the instanceOf code.
+
+
+Approach for uploading text file into Database:
+1. Create a table based on the above schema
+2. Read entire text file and parse it into JSON format
+3. Format Data as per insert queries.
+    The formatData() function iterates over the entire items array and reads the values. If any of the values are not in appropriate format then using parseInt() or formatDate() function convert them into desire data types. The "insertValues" contains an array of values that needs to be inserted into DB for the respective table.
+4. Create tables and insert values into tables
+    The "uploadDb" function creates tables and performs bulk insertion operation for all the tables.
+
+Approach for fetching observations between provided timestamp:
+1. Here, each item is accompanied by a timestamps array, showing up to three regional( Americas, Asia-Pacific and EMEA region) millisecond-precision collection timestamps. In this query, I have to fetch observations for the Americas region between provided timestamps.
+2. Write the output of the query into CSV file
+
+Approach for fetching observations for provided subject:
+1. Here, each item has an array of subjects. Due to this, we have to store subjects into separate tables.
+2. To fetch news items with the provided subject, we will first have to find "guid" for news items with the provided subject from "subject_news" table and use those guids for fetching news items from "items" table.
+3. Write the output of the query into a CSV file
+
+Challenges:
+1. It was a little challenging for me to create a schema for the news items from reading the text file. It had a lot of components in it. But documentation helped me a lot in understanding all the fields in the text file and in creating a schema.
+2. Initially, I also faced an issue in inserting fields with DateTime values into the MySql database. It was giving parsing error with DateTime string from a text file. I have never used a relational database with nodejs before. But google search helped me in understanding and resolving the issue.
